@@ -32,7 +32,7 @@ class LoginScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: Text(
                     "Log in",
                     style: TextStyle(
@@ -132,7 +132,6 @@ class LoginScreen extends StatelessWidget {
                               fontSize: 20,
                               color: Color(0xFF3E75B4)),
                         ))),
-                SizedBox(height: 30),
               ],
             ),
           ),
