@@ -1,13 +1,26 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notes/Register.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+import 'Verify.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MaterialApp(
-    home: LoginScreen(),
+    initialRoute: '/',
+    routes: {
+      '/': (context) => LoginScreen(),
+      'register': (context) => Register(),
+      'verify': (context) => Verify()
+    },
     debugShowCheckedModeBanner: false,
   ));
 }
 
 class LoginScreen extends StatelessWidget {
+  FirebaseAuth Auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   @override
@@ -115,11 +128,30 @@ class LoginScreen extends StatelessWidget {
                     child: FlatButton(
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
-                        onPressed: () {
+                        onPressed: () async {
                           if (checkFields()) {
                             //TODO:Navigate To HomeScreen,Login Using Firebase
-
-                            print("Login Successful");
+                            try {
+                              UserCredential userCredential =
+                                  await Auth.signInWithEmailAndPassword(
+                                      email: _emailController.text,
+                                      password: _passwordController.text);
+                              if (Auth.currentUser.emailVerified) {
+                                Navigator.pushReplacementNamed(
+                                    (context), 'register');
+                              } else {
+                                Navigator.pushNamed((context), 'verify');
+                              }
+                            } on FirebaseAuthException catch (e) {
+                              if (e.code == 'weak-password') {
+                                print('The password provided is too weak.');
+                              } else if (e.code == 'email-already-in-use') {
+                                print(
+                                    'The account already exists for that email.');
+                              }
+                            } catch (e) {
+                              print(e);
+                            }
                           }
                         },
                         child: Text(
@@ -184,7 +216,7 @@ class LoginScreen extends StatelessWidget {
                             splashColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onPressed: () {
-                              Navigator.pushNamed(context, 'Register');
+                              Navigator.pushNamed(context, 'register');
                             },
                             child: Text(
                               "Register",
