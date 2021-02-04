@@ -9,13 +9,16 @@ class _NoteState extends State<Note> {
   TextEditingController title = TextEditingController();
 
   TextEditingController body = TextEditingController();
+  void setNote(TextEditingController tit, TextEditingController bod) {
+    tit.text = "";
+    tit.selection = TextSelection.fromPosition(
+      TextPosition(offset: tit.text.length),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    title.text = "Hello";
-    title.selection =
-        TextSelection.fromPosition(TextPosition(offset: title.text.length));
-    setState(() {});
+    setNote(title, body);
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
@@ -34,6 +37,7 @@ class _NoteState extends State<Note> {
         ),
         body: Column(children: [
           TextField(
+            controller: title,
             maxLines: null,
             decoration: InputDecoration(
                 border: InputBorder.none,
@@ -47,6 +51,7 @@ class _NoteState extends State<Note> {
                 fontWeight: FontWeight.bold),
           ),
           TextField(
+            controller: body,
             maxLines: null,
             decoration: InputDecoration(
                 border: InputBorder.none,
