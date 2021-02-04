@@ -10,7 +10,9 @@ import Firebase
   ) -> Bool {
     
     GeneratedPluginRegistrant.register(with: self)
+    if(FirebaseApp.app()==nil){
     FirebaseApp.configure()
+    }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
