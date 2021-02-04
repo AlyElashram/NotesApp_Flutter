@@ -71,6 +71,17 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+            backgroundColor: Colors.grey[900],
+            leading: FlatButton(
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.blue,
+              ),
+              splashColor: null,
+              highlightColor: null,
+              onPressed: () => Navigator.of(context).pop(),
+            )),
         backgroundColor: Colors.grey[900],
         body: SafeArea(
           child: Column(
@@ -197,7 +208,6 @@ class _RegisterState extends State<Register> {
                             onPressed: () async {
                               int checkParam = checkFields();
                               if (checkParam == 0) {
-                                //TODO:Navigate to Login Screen
                                 try {
                                   UserCredential userCredential =
                                       await FirebaseAuth
@@ -209,6 +219,7 @@ class _RegisterState extends State<Register> {
                                       (context), '/');
                                 } on FirebaseAuthException catch (e) {
                                   if (e.code == 'weak-password') {
+                                    //TODO: pop up Dialogue for message
                                     print('The password provided is too weak.');
                                   } else if (e.code == 'email-already-in-use') {
                                     print(
@@ -231,7 +242,7 @@ class _RegisterState extends State<Register> {
                               }
                             },
                             child: Text(
-                              "Login",
+                              "Register",
                               style: TextStyle(
                                   fontFamily: 'SF_Pro_Display',
                                   fontSize: 20,

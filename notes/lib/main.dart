@@ -11,7 +11,7 @@ Future<void> main() async {
   runApp(MaterialApp(
     initialRoute: '/',
     routes: {
-      '/': (context) => Note(),
+      '/': (context) => LoginScreen(),
       'register': (context) => Register(),
       'verify': (context) => Verify(),
       'Note': (context) => Note()
@@ -131,7 +131,6 @@ class LoginScreen extends StatelessWidget {
                         highlightColor: Colors.transparent,
                         onPressed: () async {
                           if (checkFields()) {
-                            //TODO:Navigate To HomeScreen,Login Using Firebase
                             try {
                               UserCredential userCredential =
                                   await auth.signInWithEmailAndPassword(
@@ -139,11 +138,12 @@ class LoginScreen extends StatelessWidget {
                                       password: _passwordController.text);
                               if (auth.currentUser.emailVerified) {
                                 Navigator.pushReplacementNamed(
-                                    (context), 'register');
+                                    (context), 'Note');
                               } else {
                                 Navigator.pushNamed((context), 'verify');
                               }
                             } on FirebaseAuthException catch (e) {
+                              //TODO: pop up Dialogue for message
                               if (e.code == 'weak-password') {
                                 print('The password provided is too weak.');
                               } else if (e.code == 'email-already-in-use') {

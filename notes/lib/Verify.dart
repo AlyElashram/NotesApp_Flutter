@@ -34,6 +34,17 @@ class _VerifyState extends State<Verify> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Colors.grey[900],
+          leading: FlatButton(
+            child: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.blue,
+            ),
+            splashColor: null,
+            highlightColor: null,
+            onPressed: () => Navigator.of(context).pop(),
+          )),
       backgroundColor: Colors.grey[900],
       body: Column(
         children: [
