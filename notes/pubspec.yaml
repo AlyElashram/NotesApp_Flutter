@@ -63,6 +63,9 @@ flutter:
     - family: SF_Pro_Display
       fonts:
         - asset: fonts/sf-ui-display-medium.otf
+    - family: SF
+      fonts:
+        - asset: fonts/sf-ui-display-light.otf    
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

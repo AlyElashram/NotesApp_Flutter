@@ -12,7 +12,6 @@ class _VerifyState extends State<Verify> {
   FirebaseAuth auth = FirebaseAuth.instance;
   User user;
   Timer timer;
-  String text;
 
   @override
   void initState() {
@@ -35,9 +34,82 @@ class _VerifyState extends State<Verify> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-      child: Text("Email has been sent to $text please verify email"),
-    ));
+      backgroundColor: Colors.grey[900],
+      body: Column(
+        children: [
+          Expanded(
+            flex: 1,
+            child: SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(4),
+                  ),
+                  Center(
+                    child: Text(
+                      "Verify",
+                      style: TextStyle(
+                          fontFamily: 'SF',
+                          fontSize: 40,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+              flex: 5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    backgroundImage: AssetImage('assets/Email_icon.png'),
+                    radius: 70,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                  ),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(40),
+                              topRight: Radius.circular(40)),
+                          color: Colors.white),
+                      child: Padding(
+                        padding: EdgeInsets.all(14),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Check Your Email",
+                              style: TextStyle(
+                                  fontFamily: 'SF',
+                                  fontSize: 32,
+                                  color: Colors.black),
+                            ),
+                            Padding(padding: EdgeInsets.all(20)),
+                            Text(
+                              "A verification Email \n has been sent to \n${user.email}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'SF',
+                                  fontSize: 22,
+                                  color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ))
+        ],
+      ),
+    );
   }
 
   Future<void> checkEmailVerified() async {

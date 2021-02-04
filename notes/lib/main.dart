@@ -20,7 +20,7 @@ Future<void> main() async {
 }
 
 class LoginScreen extends StatelessWidget {
-  FirebaseAuth Auth = FirebaseAuth.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   @override
@@ -133,10 +133,10 @@ class LoginScreen extends StatelessWidget {
                             //TODO:Navigate To HomeScreen,Login Using Firebase
                             try {
                               UserCredential userCredential =
-                                  await Auth.signInWithEmailAndPassword(
+                                  await auth.signInWithEmailAndPassword(
                                       email: _emailController.text,
                                       password: _passwordController.text);
-                              if (Auth.currentUser.emailVerified) {
+                              if (auth.currentUser.emailVerified) {
                                 Navigator.pushReplacementNamed(
                                     (context), 'register');
                               } else {
@@ -148,6 +148,8 @@ class LoginScreen extends StatelessWidget {
                               } else if (e.code == 'email-already-in-use') {
                                 print(
                                     'The account already exists for that email.');
+                              } else {
+                                print(e);
                               }
                             } catch (e) {
                               print(e);
