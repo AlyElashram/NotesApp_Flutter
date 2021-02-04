@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>756543838072-c05smfir8261k01p756lud65stauge33.apps.googleusercontent.com</string>
+	<string>756543838072-cg4hpqgu3bl96l8624omc5l7ifu5lvls.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.756543838072-c05smfir8261k01p756lud65stauge33</string>
+	<string>com.googleusercontent.apps.756543838072-cg4hpqgu3bl96l8624omc5l7ifu5lvls</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDQGnRsFl6wCWikjQfD9MENqr0qgMSa7SA</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.notes</string>
+	<string>com.AlyElashram.notes</string>
 	<key>PROJECT_ID</key>
 	<string>notesflutter-66157</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:756543838072:ios:63925e3a55c6cf610b5a8d</string>
+	<string>1:756543838072:ios:3f4c3297f6e490370b5a8d</string>
 </dict>
 </plist>

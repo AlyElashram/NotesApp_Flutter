@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/Register.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'Note.dart';
 import 'Verify.dart';
 
 Future<void> main() async {
@@ -11,9 +11,10 @@ Future<void> main() async {
   runApp(MaterialApp(
     initialRoute: '/',
     routes: {
-      '/': (context) => LoginScreen(),
+      '/': (context) => Note(),
       'register': (context) => Register(),
-      'verify': (context) => Verify()
+      'verify': (context) => Verify(),
+      'Note': (context) => Note()
     },
     debugShowCheckedModeBanner: false,
   ));
