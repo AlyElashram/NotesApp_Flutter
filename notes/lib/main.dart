@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:notes/Register.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'AllNotes.dart';
 import 'Note.dart';
 import 'Verify.dart';
 
@@ -14,12 +16,14 @@ Future<void> main() async {
       '/': (context) => LoginScreen(),
       'register': (context) => Register(),
       'verify': (context) => Verify(),
-      'Note': (context) => Note()
+      'Note': (context) => Note(),
+      'AllNotes': (context) => AllNotes()
     },
     debugShowCheckedModeBanner: false,
   ));
 }
 
+// ignore: must_be_immutable
 class LoginScreen extends StatelessWidget {
   FirebaseAuth auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
@@ -132,13 +136,11 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () async {
                           if (checkFields()) {
                             try {
-                              UserCredential userCredential =
-                                  await auth.signInWithEmailAndPassword(
-                                      email: _emailController.text,
-                                      password: _passwordController.text);
+                              await auth.signInWithEmailAndPassword(
+                                  email: _emailController.text,
+                                  password: _passwordController.text);
                               if (auth.currentUser.emailVerified) {
-                                Navigator.pushReplacementNamed(
-                                    (context), 'Note');
+                                Navigator.pushNamed((context), 'AllNotes');
                               } else {
                                 Navigator.pushNamed((context), 'verify');
                               }

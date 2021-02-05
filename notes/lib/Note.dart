@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Note extends StatefulWidget {
   @override
@@ -6,9 +8,11 @@ class Note extends StatefulWidget {
 }
 
 class _NoteState extends State<Note> {
+  String Uid = FirebaseAuth.instance.currentUser.uid;
+  DatabaseReference reference = FirebaseDatabase.instance.reference();
   TextEditingController title = TextEditingController();
-
   TextEditingController body = TextEditingController();
+
   void setNote(TextEditingController tit, TextEditingController bod) {
     tit.text = "";
     tit.selection = TextSelection.fromPosition(
@@ -31,8 +35,15 @@ class _NoteState extends State<Note> {
             splashColor: null,
             highlightColor: null,
             //TODO:Implement on back pressed to save using firebase realtime database
-            onPressed: null,
-            color: Colors.blue,
+            onPressed: () {
+              if (title.text != '' && body.text != '') {
+                reference
+                    .child(Uid)
+                    .push()
+                    .set({"title": title.text, "body": body.text});
+              }
+              Navigator.of(context).pop();
+            },
           ),
         ),
         body: Column(children: [
