@@ -10,19 +10,32 @@ class Note extends StatefulWidget {
 class _NoteState extends State<Note> {
   String Uid = FirebaseAuth.instance.currentUser.uid;
   DatabaseReference reference = FirebaseDatabase.instance.reference();
+  String oldTitle;
+  String oldBody;
   TextEditingController title = TextEditingController();
   TextEditingController body = TextEditingController();
 
   void setNote(TextEditingController tit, TextEditingController bod) {
-    tit.text = "";
+    tit.text = oldTitle;
     tit.selection = TextSelection.fromPosition(
       TextPosition(offset: tit.text.length),
+    );
+    bod.text = oldBody;
+    bod.selection = TextSelection.fromPosition(
+      TextPosition(offset: bod.text.length),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    setNote(title, body);
+    try {
+      Map data = ModalRoute.of(context).settings.arguments;
+      oldTitle = data['title'];
+      oldBody = data['body'];
+      setNote(title, body);
+    } catch (e) {
+      print(e);
+    }
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
@@ -36,13 +49,13 @@ class _NoteState extends State<Note> {
             highlightColor: null,
             //TODO:Implement on back pressed to save using firebase realtime database
             onPressed: () {
-              if (title.text != '' && body.text != '') {
+              if (title.text != '' || body.text != '') {
                 reference
                     .child(Uid)
                     .push()
                     .set({"title": title.text, "body": body.text});
               }
-              Navigator.of(context).pop();
+              Navigator.pushReplacementNamed(context, 'AllNotes');
             },
           ),
         ),
