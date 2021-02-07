@@ -10,8 +10,10 @@ class Note extends StatefulWidget {
 class _NoteState extends State<Note> {
   String Uid = FirebaseAuth.instance.currentUser.uid;
   DatabaseReference reference = FirebaseDatabase.instance.reference();
+  bool oldNote = false;
   String oldTitle;
   String oldBody;
+  String oldKey;
   TextEditingController title = TextEditingController();
   TextEditingController body = TextEditingController();
 
@@ -32,10 +34,10 @@ class _NoteState extends State<Note> {
       Map data = ModalRoute.of(context).settings.arguments;
       oldTitle = data['title'];
       oldBody = data['body'];
+      oldKey = data['key'];
+      oldNote = true;
       setNote(title, body);
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
@@ -45,15 +47,19 @@ class _NoteState extends State<Note> {
               Icons.arrow_back_ios,
               color: Colors.blue,
             ),
-            splashColor: null,
-            highlightColor: null,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
             //TODO:Implement on back pressed to save using firebase realtime database
             onPressed: () {
               if (title.text != '' || body.text != '') {
-                reference
-                    .child(Uid)
-                    .push()
-                    .set({"title": title.text, "body": body.text});
+                if (!oldNote) {
+                  String key = reference.child(Uid).push().key;
+                  reference.child(Uid).child(key).set(
+                      {"title": title.text, "body": body.text, "key": key});
+                } else {
+                  reference.child(Uid).child(oldKey).update(
+                      {"title": title.text, "body": body.text, "key": oldKey});
+                }
               }
               Navigator.pushReplacementNamed(context, 'AllNotes');
             },

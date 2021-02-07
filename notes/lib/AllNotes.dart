@@ -44,8 +44,8 @@ class _AllNotesState extends State<AllNotes> {
           ],
           backgroundColor: Colors.grey[900],
           leading: FlatButton(
-              splashColor: null,
-              highlightColor: null,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
               onPressed: () {
                 //TODO:This will log you out Dialog
                 Navigator.of(context).pop();
@@ -59,39 +59,63 @@ class _AllNotesState extends State<AllNotes> {
                   SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
               itemCount: list.hasData ? list.data.length : 0,
               itemBuilder: (_, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, 'Note', arguments: {
-                      'title': list.data[index]['title'],
-                      'body': list.data[index]['body']
-                    });
+                return Dismissible(
+                  background: Container(
+                    color: Colors.red,
+                    child: Icon(Icons.delete_forever_rounded),
+                  ),
+                  direction: DismissDirection.endToStart,
+                  key: Key(list.data[index]['key']),
+                  onDismissed: (DismissDirection direction) async {
+                    await FirebaseDatabase.instance
+                        .reference()
+                        .child(uid)
+                        .child(list.data[index]['key'])
+                        .remove();
+                    list.data.removeAt(index);
+                    setState(() {});
                   },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[850],
-                        borderRadius: BorderRadius.all(Radius.circular(40))),
-                    margin: EdgeInsets.all(20),
-                    height: 150,
+                  child: InkWell(
+                    highlightColor: Colors.transparent,
+                    splashColor: Colors.transparent,
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, 'Note',
+                          arguments: {
+                            'title': list.data[index]['title'],
+                            'body': list.data[index]['body'],
+                            'key': list.data[index]['key']
+                          });
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            list.data[index]['title'],
-                            style: TextStyle(
-                                fontFamily: 'SF',
-                                color: Colors.blue,
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Colors.grey[850],
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(40))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                list.data[index]['title'],
+                                style: TextStyle(
+                                    fontFamily: 'SF',
+                                    color: Colors.blue,
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(list.data[index]['body'],
+                                  style: TextStyle(
+                                      fontFamily: 'SF',
+                                      color: Colors.blue,
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold))
+                            ],
                           ),
-                          Text(list.data[index]['body'],
-                              style: TextStyle(
-                                  fontFamily: 'SF',
-                                  color: Colors.blue,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold))
-                        ],
+                        ),
                       ),
                     ),
                   ),
