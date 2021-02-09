@@ -127,7 +127,7 @@ class _VerifyState extends State<Verify> {
     user = auth.currentUser;
     await user.reload();
     if (user.emailVerified) {
-      Navigator.pushReplacementNamed((context), 'register');
+      Navigator.pushReplacementNamed((context), 'AllNotes');
       timer.cancel();
     }
   }

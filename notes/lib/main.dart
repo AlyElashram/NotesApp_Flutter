@@ -65,7 +65,7 @@ class LoginScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                   child: Text(
-                    "Log in",
+                    "Log In",
                     style: TextStyle(
                         fontFamily: 'SF_Pro_Display',
                         fontSize: 40,
@@ -231,10 +231,10 @@ class LoginScreen extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(0),
                             child: Text(
-                              "Not a user?",
+                              "Not a user? ",
                               style: TextStyle(
-                                  fontFamily: 'SF_Pro_Display',
-                                  fontSize: 20,
+                                  fontFamily: 'SF',
+                                  fontSize: 22,
                                   color: Colors.white),
                             ),
                           ),
