@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'AllNotes.dart';
 import 'Note.dart';
 import 'Verify.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,18 @@ Future<void> main() async {
 
 // ignore: must_be_immutable
 class LoginScreen extends StatelessWidget {
+  Future<User> googleSignIn() async {
+    GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    UserCredential authResult = await auth.signInWithCredential(credential);
+    User user = authResult.user;
+    print(user.displayName);
+  }
+
   FirebaseAuth auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -187,7 +200,16 @@ class LoginScreen extends StatelessWidget {
                       shape: CircleBorder(),
                     ),
                     RawMaterialButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await googleSignIn();
+                        if (auth.currentUser != null) {
+                          if (auth.currentUser.emailVerified) {
+                            Navigator.pushNamed((context), 'AllNotes');
+                          } else {
+                            Navigator.pushNamed(context, 'verify');
+                          }
+                        }
+                      },
                       fillColor: Color(0x00FFFFFF),
                       child: CircleAvatar(
                         backgroundImage: AssetImage('assets/gmail_logo.png'),

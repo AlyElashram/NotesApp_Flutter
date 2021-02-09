@@ -13,44 +13,41 @@ class _AllNotesState extends State<AllNotes> {
     List all = [];
     // ignore: unnecessary_statements
 
-    await FirebaseDatabase.instance.reference().child(uid).once().then((value) {
-      Map<dynamic, dynamic> data = value.value;
-      data.forEach((k, v) {
-        all.add(v);
+    try {
+      await FirebaseDatabase.instance
+          .reference()
+          .child(uid)
+          .once()
+          .then((value) {
+        Map<dynamic, dynamic> data = value.value;
+        data.forEach((k, v) {
+          all.add(v);
+        });
       });
-    });
-    return all;
+      return all;
+    } catch (e) {}
   }
 
   @override
   Widget build(BuildContext context) {
     String uid = FirebaseAuth.instance.currentUser.uid;
-    DatabaseReference refrence =
-        FirebaseDatabase.instance.reference().child(uid);
-    Future<List> allNotes = getNotes();
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
-          actions: [
-            FlatButton(
-              child: Icon(
-                Icons.add,
-                color: Colors.blue,
-                size: 32,
-              ),
-              onPressed: () => Navigator.pushReplacementNamed(context, 'Note'),
-            )
-          ],
-          backgroundColor: Colors.grey[900],
-          leading: FlatButton(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              onPressed: () {
-                //TODO:This will log you out Dialog
-                Navigator.of(context).pop();
-              },
-              child: Icon(Icons.arrow_back_ios, color: Colors.blue))),
+        actions: [
+          FlatButton(
+            child: Icon(
+              Icons.add,
+              color: Colors.blue,
+              size: 32,
+            ),
+            onPressed: () => Navigator.pushReplacementNamed(context, 'Note'),
+          )
+        ],
+        backgroundColor: Colors.grey[900],
+        leading: Container(),
+      ),
       body: FutureBuilder(
         future: getNotes(),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> list) {
