@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/Register.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,8 +9,20 @@ import 'Verify.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 Future<void> main() async {
+  String getDeviceType() {
+    final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    return data.size.shortestSide < 600 ? 'phone' : 'tablet';
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  String type = getDeviceType();
+  if (type == 'phone') {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
   runApp(MaterialApp(
     initialRoute: '/',
     routes: {
@@ -34,8 +46,7 @@ class LoginScreen extends StatelessWidget {
       idToken: googleAuth.idToken,
     );
     UserCredential authResult = await auth.signInWithCredential(credential);
-    User user = authResult.user;
-    print(user.displayName);
+    return authResult.user;
   }
 
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -157,19 +168,63 @@ class LoginScreen extends StatelessWidget {
                               } else {
                                 Navigator.pushNamed((context), 'verify');
                               }
-                            } on FirebaseAuthException catch (e) {
-                              //TODO: pop up Dialogue for message
-                              if (e.code == 'weak-password') {
-                                print('The password provided is too weak.');
-                              } else if (e.code == 'email-already-in-use') {
-                                print(
-                                    'The account already exists for that email.');
-                              } else {
-                                print(e);
-                              }
                             } catch (e) {
-                              print(e);
+                              String errorMessage = e.code;
+
+                              showDialog(
+                                  context: context,
+                                  child: AlertDialog(
+                                    title: Text(
+                                      "Signing in failed",
+                                      style: TextStyle(
+                                          fontFamily: 'SF_Pro_Display',
+                                          fontSize: 30),
+                                    ),
+                                    content: Text(
+                                      errorMessage,
+                                      style: TextStyle(
+                                          fontFamily: 'SF', fontSize: 28),
+                                    ),
+                                    actions: [
+                                      FlatButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            "Ok",
+                                            style: TextStyle(
+                                                fontFamily: 'SF', fontSize: 26),
+                                          ))
+                                    ],
+                                  ));
                             }
+                          } else {
+                            showDialog(
+                                context: context,
+                                child: AlertDialog(
+                                  title: Text(
+                                    "Signing in failed",
+                                    style: TextStyle(
+                                        fontFamily: 'SF_Pro_Display',
+                                        fontSize: 30),
+                                  ),
+                                  content: Text(
+                                    "Please fill in all the required fields",
+                                    style: TextStyle(
+                                        fontFamily: 'SF', fontSize: 26),
+                                  ),
+                                  actions: [
+                                    FlatButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          "Ok",
+                                          style: TextStyle(
+                                              fontFamily: 'SF', fontSize: 26),
+                                        ))
+                                  ],
+                                ));
                           }
                         },
                         child: Text(
@@ -213,6 +268,50 @@ class LoginScreen extends StatelessWidget {
                       fillColor: Color(0x00FFFFFF),
                       child: CircleAvatar(
                         backgroundImage: AssetImage('assets/gmail_logo.png'),
+                        radius: 20,
+                      ),
+                      padding: EdgeInsets.all(4.0),
+                      shape: CircleBorder(),
+                    ),
+                    RawMaterialButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            child: AlertDialog(
+                              title: Text(
+                                "No Sync Over devices",
+                                style: TextStyle(
+                                    fontFamily: 'SF_Pro_Display', fontSize: 30),
+                              ),
+                              content: Text(
+                                  "If you use this app offline your notes won't be synced to your other devices"),
+                              actions: [
+                                FlatButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      "Cancel",
+                                      style: TextStyle(
+                                          fontFamily: 'SF', fontSize: 26),
+                                    )),
+                                FlatButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Navigator.pushReplacementNamed(
+                                          context, 'AllNotes');
+                                    },
+                                    child: Text(
+                                      "Ok",
+                                      style: TextStyle(
+                                          fontFamily: 'SF', fontSize: 26),
+                                    ))
+                              ],
+                            ));
+                      },
+                      fillColor: Color(0x00FFFFFF),
+                      child: CircleAvatar(
+                        backgroundImage: AssetImage('assets/Unknown.png'),
                         radius: 20,
                       ),
                       padding: EdgeInsets.all(4.0),

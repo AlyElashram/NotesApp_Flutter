@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -209,6 +210,7 @@ class _RegisterState extends State<Register> {
                               int checkParam = checkFields();
                               if (checkParam == 0) {
                                 try {
+                                  // ignore: unused_local_variable
                                   UserCredential userCredential =
                                       await FirebaseAuth
                                           .instance
@@ -218,27 +220,92 @@ class _RegisterState extends State<Register> {
                                   Navigator.pushReplacementNamed(
                                       (context), '/');
                                 } on FirebaseAuthException catch (e) {
-                                  if (e.code == 'weak-password') {
-                                    //TODO: pop up Dialogue for message
-                                    print('The password provided is too weak.');
-                                  } else if (e.code == 'email-already-in-use') {
-                                    print(
-                                        'The account already exists for that email.');
-                                  }
-                                } catch (e) {
-                                  print(e);
+                                  String errorMessage = e.code;
+
+                                  showDialog(
+                                      context: context,
+                                      child: AlertDialog(
+                                        title: Text(
+                                          "Registering failed",
+                                          style: TextStyle(
+                                              fontFamily: 'SF_Pro_Display',
+                                              fontSize: 30),
+                                        ),
+                                        content: Text(
+                                          errorMessage,
+                                          style: TextStyle(
+                                              fontFamily: 'SF', fontSize: 26),
+                                        ),
+                                        actions: [
+                                          FlatButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                "Ok",
+                                                style: TextStyle(
+                                                    fontFamily: 'SF',
+                                                    fontSize: 26),
+                                              ))
+                                        ],
+                                      ));
                                 }
                               } else if (checkParam == 1) {
-                                showMyDialog(
+                                showDialog(
                                     context: context,
-                                    title: "Missing Information",
-                                    body:
-                                        "Please Fill in the missing information");
+                                    child: AlertDialog(
+                                      title: Text(
+                                        "Registering failed",
+                                        style: TextStyle(
+                                            fontFamily: 'SF_Pro_Display',
+                                            fontSize: 30),
+                                      ),
+                                      content: Text(
+                                        "Please fill in all the required fields",
+                                        style: TextStyle(
+                                            fontFamily: 'SF', fontSize: 26),
+                                      ),
+                                      actions: [
+                                        FlatButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "Ok",
+                                              style: TextStyle(
+                                                  fontFamily: 'SF',
+                                                  fontSize: 26),
+                                            ))
+                                      ],
+                                    ));
                               } else if (checkParam == 2) {
-                                showMyDialog(
+                                showDialog(
                                     context: context,
-                                    title: "Mismatch",
-                                    body: "Passwords do not match");
+                                    child: AlertDialog(
+                                      title: Text(
+                                        "Registering failed",
+                                        style: TextStyle(
+                                            fontFamily: 'SF_Pro_Display',
+                                            fontSize: 30),
+                                      ),
+                                      content: Text(
+                                        "Passwords do not match",
+                                        style: TextStyle(
+                                            fontFamily: 'SF', fontSize: 26),
+                                      ),
+                                      actions: [
+                                        FlatButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "Ok",
+                                              style: TextStyle(
+                                                  fontFamily: 'SF',
+                                                  fontSize: 26),
+                                            ))
+                                      ],
+                                    ));
                               }
                             },
                             child: Text(

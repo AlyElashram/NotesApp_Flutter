@@ -9,9 +9,9 @@ class DatabaseHelper {
   static final _dbVersion = 1;
   static final _tableName = 'NotesTable';
   static final _columnID = "_id";
-  static final _columnKey = 'key';
-  static final _columnTitle = 'Title';
-  static final _columnBody = 'Body';
+  static final columnKey = 'key';
+  static final columnTitle = 'Title';
+  static final columnBody = 'Body';
   //Converting to Singleton Class
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -33,9 +33,9 @@ class DatabaseHelper {
   }
 
   Future _onCreate(Database db, int version) {
-    db.execute('''
+    return db.execute('''
           CREATE TABLE $_tableName ($_columnID INTEGER PRIMARY KEY,
-          $_columnKey TEXT NOT NULL,$_columnTitle TEXT,$_columnBody TEXT)
+          $columnKey TEXT,$columnTitle TEXT,$columnBody TEXT)
         ''');
   }
 

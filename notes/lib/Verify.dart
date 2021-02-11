@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -63,7 +63,7 @@ class _VerifyState extends State<Verify> {
                       style: TextStyle(
                           fontFamily: 'SF',
                           fontSize: 40,
-                          color: Colors.white,
+                          color: Colors.blue,
                           fontWeight: FontWeight.w400),
                     ),
                   ),
@@ -90,7 +90,7 @@ class _VerifyState extends State<Verify> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(40),
                               topRight: Radius.circular(40)),
-                          color: Colors.white),
+                          color: Colors.grey[850]),
                       child: Padding(
                         padding: EdgeInsets.all(14),
                         child: Column(
@@ -100,11 +100,22 @@ class _VerifyState extends State<Verify> {
                               style: TextStyle(
                                   fontFamily: 'SF',
                                   fontSize: 32,
-                                  color: Colors.black),
+                                  color: Colors.blue),
                             ),
                             Padding(padding: EdgeInsets.all(20)),
                             Text(
-                              "A verification Email \n has been sent to \n${user.email}",
+                              "A verification email has been sent to ${user.email}. Verify your Email to sync notes across all your devices",
+                              maxLines: null,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'SF',
+                                  fontSize: 22,
+                                  color: Colors.grey),
+                            ),
+                            Padding(padding: EdgeInsets.all(20)),
+                            Text(
+                              "You can use the app offline if you wish not to verify your email ,but syncing notes won't be available",
+                              maxLines: null,
                               style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontFamily: 'SF',

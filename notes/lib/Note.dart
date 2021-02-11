@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:notes/DatabaseHelper.dart';
 
 class Note extends StatefulWidget {
   @override
@@ -8,7 +9,7 @@ class Note extends StatefulWidget {
 }
 
 class _NoteState extends State<Note> {
-  String Uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser.uid;
   DatabaseReference reference = FirebaseDatabase.instance.reference();
   bool oldNote = false;
   String oldTitle;
@@ -49,15 +50,21 @@ class _NoteState extends State<Note> {
             ),
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
-            //TODO:Implement on back pressed to save using firebase realtime database
-            onPressed: () {
+            onPressed: () async {
               if (title.text != '' || body.text != '') {
                 if (!oldNote) {
-                  String key = reference.child(Uid).push().key;
-                  reference.child(Uid).child(key).set(
+                  //push on firebase
+                  String key = reference.child(uid).push().key;
+                  reference.child(uid).child(key).set(
                       {"title": title.text, "body": body.text, "key": key});
+                  //push in SQL database
+                  int id = await DatabaseHelper.instance.insert({
+                    DatabaseHelper.columnTitle: title.text,
+                    DatabaseHelper.columnBody: body.text,
+                    DatabaseHelper.columnKey: key
+                  });
                 } else {
-                  reference.child(Uid).child(oldKey).update(
+                  reference.child(uid).child(oldKey).update(
                       {"title": title.text, "body": body.text, "key": oldKey});
                 }
               }

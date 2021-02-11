@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AllNotes extends StatefulWidget {
   @override
@@ -25,7 +26,9 @@ class _AllNotesState extends State<AllNotes> {
         });
       });
       return all;
-    } catch (e) {}
+    } catch (e) {
+      return [];
+    }
   }
 
   @override
