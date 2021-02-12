@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:notes/DatabaseHelper.dart';
 
 class Note extends StatefulWidget {
   @override
@@ -57,12 +56,6 @@ class _NoteState extends State<Note> {
                   String key = reference.child(uid).push().key;
                   reference.child(uid).child(key).set(
                       {"title": title.text, "body": body.text, "key": key});
-                  //push in SQL database
-                  int id = await DatabaseHelper.instance.insert({
-                    DatabaseHelper.columnTitle: title.text,
-                    DatabaseHelper.columnBody: body.text,
-                    DatabaseHelper.columnKey: key
-                  });
                 } else {
                   reference.child(uid).child(oldKey).update(
                       {"title": title.text, "body": body.text, "key": oldKey});

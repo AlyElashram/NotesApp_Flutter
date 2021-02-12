@@ -56,8 +56,6 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     bool checkFields() {
       if (_emailController.text == '' || _passwordController.text == '') {
-        //TODO: pop up Dialogue for message
-        print("Email or Password Field is Empty");
         return false;
       }
       return true;
