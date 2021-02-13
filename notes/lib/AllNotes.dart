@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/DataBaseHelper.dart';
+import 'package:notes/Loading.dart';
 import 'Global.dart';
 
 class AllNotes extends StatefulWidget {
@@ -9,37 +10,96 @@ class AllNotes extends StatefulWidget {
   _AllNotesState createState() => _AllNotesState();
 }
 
+//TODO:Delete from firebase
 class _AllNotesState extends State<AllNotes> {
   Future<List> getNotes() async {
+    if (Global.justLogged && !Global.useOffline) {
+      await syncFromFirebase();
+      Global.justLogged = false;
+    }
     DatabaseHelper db = DatabaseHelper();
     List all = [];
     List<Map<String, dynamic>> data = await db.getNoteMapList();
     data.forEach((element) {
       all.add(element);
     });
+
     return all;
   }
 
-  void syncToFirebase() async {
-    String uid = FirebaseAuth.instance.currentUser.uid;
-    DatabaseReference reference =
-        FirebaseDatabase.instance.reference().child(uid);
-    List onlineData = [];
+  Future<void> syncFromFirebase() async {
     DatabaseHelper db = DatabaseHelper();
+    List onlineNotes = await pullAndRebase();
+    onlineNotes.forEach((element) async {
+      await db.deleteNote(element['id']);
+      await db.insertNote({
+        "title": element['title'],
+        "body": element['body'],
+        "id": element['id'],
+        "key": element["key"]
+      });
+    });
+  }
+
+  Future<List> pullAndRebase() async {
+    String uid = FirebaseAuth.instance.currentUser.uid;
+    List onlineData = [];
     try {
       await FirebaseDatabase.instance
           .reference()
           .child(uid)
           .once()
           .then((value) {
-        Map<dynamic, dynamic> data = value.value;
-        data.forEach((k, v) {
+        Map<dynamic, dynamic> online = value.value;
+
+        online.forEach((k, v) {
           onlineData.add(v);
         });
       });
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+      return [];
+    }
+    return onlineData;
+  }
 
-    List<Map<String, dynamic>> data = await db.getNoteMapList();
+  Future<void> syncToFirebase() async {
+    List offlineNotes = await getNotes();
+    offlineNotes.forEach((element) {
+      checkKeyandPush(element);
+    });
+  }
+
+  void checkKeyandPush(Map<String, dynamic> note) async {
+    String uid = FirebaseAuth.instance.currentUser.uid;
+    DatabaseHelper db = DatabaseHelper();
+    if (note['key'] == null) {
+      String key = FirebaseDatabase.instance.reference().child(uid).push().key;
+      Map<String, dynamic> updatedNote = {
+        "title": note['title'],
+        "body": note['body'],
+        "id": note['id'],
+        "key": key
+      };
+      db.updateNote(updatedNote);
+      await FirebaseDatabase.instance
+          .reference()
+          .child(uid)
+          .child(key)
+          .update(updatedNote);
+    } else {
+      Map<String, dynamic> updatedNote = {
+        "title": note['title'],
+        "body": note['body'],
+        "id": note['id'],
+        "key": note['key']
+      };
+      await FirebaseDatabase.instance
+          .reference()
+          .child(uid)
+          .child(note['key'])
+          .update(updatedNote);
+    }
   }
 
   @override
@@ -73,10 +133,13 @@ class _AllNotesState extends State<AllNotes> {
                       FlatButton(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.pop(context);
+                            showDialog(context: context, child: Loading());
+                            await syncToFirebase();
                             FirebaseAuth auth = FirebaseAuth.instance;
                             auth.signOut();
+                            Navigator.pop(context);
                             Navigator.pushReplacementNamed(context, '/');
                           },
                           child: Text(
@@ -102,6 +165,55 @@ class _AllNotesState extends State<AllNotes> {
         ),
         actions: [
           FlatButton(
+            onPressed: () async {
+              if (Global.useOffline) {
+                showDialog(
+                    context: context,
+                    child: AlertDialog(
+                      title: Text(
+                        "Unable to sync",
+                        style: TextStyle(
+                            fontFamily: 'SF_Pro_Display', fontSize: 30),
+                      ),
+                      content: Text(
+                        "Syncing is not available when using the app offline\nWould you like to sign in ?",
+                        style: TextStyle(fontFamily: 'SF', fontSize: 24),
+                      ),
+                      actions: [
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.pushReplacementNamed(context, '/');
+                            },
+                            child: Text(
+                              "Ok",
+                              style: TextStyle(fontFamily: 'SF', fontSize: 26),
+                            )),
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(fontFamily: 'SF', fontSize: 26),
+                            ))
+                      ],
+                    ));
+              } else {
+                await syncToFirebase();
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      Future.delayed(Duration(milliseconds: 500), () {
+                        Navigator.of(context).pop(true);
+                      });
+                      return AlertDialog(
+                        title: Text('Sync done'),
+                      );
+                    });
+              }
+            },
             onLongPress: () {
               showDialog(
                   context: context,
@@ -124,7 +236,6 @@ class _AllNotesState extends State<AllNotes> {
               color: Colors.blue,
               size: 26,
             ),
-            onPressed: () {},
           ),
           FlatButton(
             splashColor: Colors.transparent,
@@ -157,9 +268,21 @@ class _AllNotesState extends State<AllNotes> {
                   onDismissed: (DismissDirection direction) async {
                     DatabaseHelper db = DatabaseHelper();
                     await db.deleteNote(list.data[index]['id']);
-                    setState(() {
-                      list.data.removeAt(index);
-                    });
+                    if (!Global.useOffline &&
+                        FirebaseAuth.instance.currentUser != null) {
+                      try {
+                        await FirebaseDatabase.instance
+                            .reference()
+                            .child(FirebaseAuth.instance.currentUser.uid)
+                            .child(list.data[index]['key'])
+                            .remove();
+                      } catch (e) {
+                        print(e);
+                      }
+                      setState(() {
+                        list.data.removeAt(index);
+                      });
+                    }
                   },
                   child: InkWell(
                     highlightColor: Colors.transparent,

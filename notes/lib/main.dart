@@ -29,7 +29,6 @@ Future<void> main() async {
   String initialRoute = '/';
   if (auth.currentUser != null) {
     initialRoute = 'AllNotes';
-    print(auth.currentUser);
   }
   runApp(MaterialApp(
     initialRoute: initialRoute,

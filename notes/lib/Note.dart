@@ -9,8 +9,6 @@ class Note extends StatefulWidget {
 }
 
 class _NoteState extends State<Note> {
-  String uid = FirebaseAuth.instance.currentUser.uid;
-  DatabaseReference reference = FirebaseDatabase.instance.reference();
   bool oldNote = false;
   int oldID;
   String oldTitle;
