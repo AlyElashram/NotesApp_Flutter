@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:notes/Register.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'AllNotes.dart';
+import 'Global.dart';
+import 'Loading.dart';
 import 'Note.dart';
 import 'Verify.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -23,8 +25,14 @@ Future<void> main() async {
       DeviceOrientation.portraitDown,
     ]);
   }
+  FirebaseAuth auth = FirebaseAuth.instance;
+  String initialRoute = '/';
+  if (auth.currentUser != null) {
+    initialRoute = 'AllNotes';
+    print(auth.currentUser);
+  }
   runApp(MaterialApp(
-    initialRoute: '/',
+    initialRoute: initialRoute,
     routes: {
       '/': (context) => LoginScreen(),
       'register': (context) => Register(),
@@ -158,15 +166,21 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () async {
                           if (checkFields()) {
                             try {
+                              showDialog(context: context, child: Loading());
                               await auth.signInWithEmailAndPassword(
                                   email: _emailController.text,
                                   password: _passwordController.text);
                               if (auth.currentUser.emailVerified) {
+                                Navigator.pop(context);
+                                Global.justLogged = true;
                                 Navigator.pushNamed((context), 'AllNotes');
                               } else {
+                                Navigator.pop(context);
+                                Global.justLogged = true;
                                 Navigator.pushNamed((context), 'verify');
                               }
                             } catch (e) {
+                              Navigator.pop(context);
                               String errorMessage = e.code;
 
                               showDialog(
@@ -254,9 +268,12 @@ class LoginScreen extends StatelessWidget {
                     ),
                     RawMaterialButton(
                       onPressed: () async {
+                        showDialog(context: context, child: Loading());
                         await googleSignIn();
                         if (auth.currentUser != null) {
                           if (auth.currentUser.emailVerified) {
+                            Navigator.pop(context);
+                            Global.justLogged = true;
                             Navigator.pushNamed((context), 'AllNotes');
                           } else {
                             Navigator.pushNamed(context, 'verify');
@@ -295,6 +312,7 @@ class LoginScreen extends StatelessWidget {
                                     )),
                                 FlatButton(
                                     onPressed: () {
+                                      Global.useOffline = true;
                                       Navigator.pop(context);
                                       Navigator.pushReplacementNamed(
                                           context, 'AllNotes');

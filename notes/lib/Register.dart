@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'Loading.dart';
+
 class Register extends StatefulWidget {
   @override
   _RegisterState createState() => _RegisterState();
@@ -210,15 +212,19 @@ class _RegisterState extends State<Register> {
                               if (checkParam == 0) {
                                 try {
                                   // ignore: unused_local_variable
+                                  showDialog(
+                                      context: context, child: Loading());
                                   UserCredential userCredential =
                                       await FirebaseAuth
                                           .instance
                                           .createUserWithEmailAndPassword(
                                               email: _emailController.text,
                                               password: _passController.text);
+                                  Navigator.pop(context);
                                   Navigator.pushReplacementNamed(
-                                      (context), '/');
+                                      (context), 'verify');
                                 } on FirebaseAuthException catch (e) {
+                                  Navigator.pop(context);
                                   String errorMessage = e.code;
 
                                   showDialog(

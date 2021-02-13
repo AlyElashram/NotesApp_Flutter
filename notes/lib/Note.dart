@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:notes/DatabaseHelper.dart';
 
 class Note extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class _NoteState extends State<Note> {
   String uid = FirebaseAuth.instance.currentUser.uid;
   DatabaseReference reference = FirebaseDatabase.instance.reference();
   bool oldNote = false;
+  int oldID;
   String oldTitle;
   String oldBody;
   String oldKey;
@@ -35,6 +37,7 @@ class _NoteState extends State<Note> {
       oldTitle = data['title'];
       oldBody = data['body'];
       oldKey = data['key'];
+      oldID = data['id'];
       oldNote = true;
       setNote(title, body);
     } catch (e) {}
@@ -51,14 +54,17 @@ class _NoteState extends State<Note> {
             highlightColor: Colors.transparent,
             onPressed: () async {
               if (title.text != '' || body.text != '') {
+                DatabaseHelper db = DatabaseHelper();
                 if (!oldNote) {
-                  //push on firebase
-                  String key = reference.child(uid).push().key;
-                  reference.child(uid).child(key).set(
-                      {"title": title.text, "body": body.text, "key": key});
+                  db.insertNote(
+                      {db.colTitle: title.text, db.colBody: body.text});
                 } else {
-                  reference.child(uid).child(oldKey).update(
-                      {"title": title.text, "body": body.text, "key": oldKey});
+                  db.updateNote({
+                    db.colTitle: title.text,
+                    db.colBody: body.text,
+                    db.colKey: oldKey,
+                    db.colid: oldID
+                  });
                 }
               }
               Navigator.pushReplacementNamed(context, 'AllNotes');
