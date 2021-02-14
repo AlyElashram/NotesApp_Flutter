@@ -38,7 +38,9 @@ class _NoteState extends State<Note> {
       oldID = data['id'];
       oldNote = true;
       setNote(title, body);
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(

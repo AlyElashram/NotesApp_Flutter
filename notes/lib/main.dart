@@ -25,9 +25,8 @@ Future<void> main() async {
       DeviceOrientation.portraitDown,
     ]);
   }
-  FirebaseAuth auth = FirebaseAuth.instance;
   String initialRoute = '/';
-  if (auth.currentUser != null) {
+  if (FirebaseAuth.instance.currentUser != null) {
     initialRoute = 'AllNotes';
   }
   runApp(MaterialApp(
@@ -166,9 +165,40 @@ class LoginScreen extends StatelessWidget {
                           if (checkFields()) {
                             try {
                               showDialog(context: context, child: Loading());
-                              await auth.signInWithEmailAndPassword(
-                                  email: _emailController.text,
-                                  password: _passwordController.text);
+                              await auth
+                                  .signInWithEmailAndPassword(
+                                      email: _emailController.text,
+                                      password: _passwordController.text)
+                                  .timeout(Duration(seconds: 10),
+                                      onTimeout: () {
+                                showDialog(
+                                    context: context,
+                                    child: AlertDialog(
+                                      title: Text(
+                                        "Signing in failed",
+                                        style: TextStyle(
+                                            fontFamily: 'SF_Pro_Display',
+                                            fontSize: 30),
+                                      ),
+                                      content: Text(
+                                        "Your Request has timed out please check your internet connections",
+                                        style: TextStyle(
+                                            fontFamily: 'SF', fontSize: 28),
+                                      ),
+                                      actions: [
+                                        FlatButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "Ok",
+                                              style: TextStyle(
+                                                  fontFamily: 'SF',
+                                                  fontSize: 26),
+                                            ))
+                                      ],
+                                    ));
+                              });
                               if (auth.currentUser.emailVerified) {
                                 Navigator.pop(context);
                                 Global.justLogged = true;
@@ -267,16 +297,10 @@ class LoginScreen extends StatelessWidget {
                     ),
                     RawMaterialButton(
                       onPressed: () async {
-                        showDialog(context: context, child: Loading());
-                        await googleSignIn();
-                        if (auth.currentUser != null) {
-                          if (auth.currentUser.emailVerified) {
-                            Navigator.pop(context);
-                            Global.justLogged = true;
-                            Navigator.pushNamed((context), 'AllNotes');
-                          } else {
-                            Navigator.pushNamed(context, 'verify');
-                          }
+                        User user = await googleSignIn();
+                        if (auth.currentUser != null && user != null) {
+                          Global.justLogged = true;
+                          Navigator.pushNamed((context), 'AllNotes');
                         }
                       },
                       fillColor: Color(0x00FFFFFF),

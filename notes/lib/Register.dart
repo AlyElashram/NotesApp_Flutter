@@ -219,7 +219,37 @@ class _RegisterState extends State<Register> {
                                           .instance
                                           .createUserWithEmailAndPassword(
                                               email: _emailController.text,
-                                              password: _passController.text);
+                                              password: _passController.text)
+                                          .timeout(Duration(seconds: 10),
+                                              onTimeout: () {
+                                    showDialog(
+                                        context: context,
+                                        child: AlertDialog(
+                                          title: Text(
+                                            "Signing in failed",
+                                            style: TextStyle(
+                                                fontFamily: 'SF_Pro_Display',
+                                                fontSize: 30),
+                                          ),
+                                          content: Text(
+                                            "Your Request has timed out please check your internet connections",
+                                            style: TextStyle(
+                                                fontFamily: 'SF', fontSize: 28),
+                                          ),
+                                          actions: [
+                                            FlatButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  "Ok",
+                                                  style: TextStyle(
+                                                      fontFamily: 'SF',
+                                                      fontSize: 26),
+                                                ))
+                                          ],
+                                        ));
+                                  });
                                   Navigator.pop(context);
                                   Navigator.pushReplacementNamed(
                                       (context), 'verify');
