@@ -58,16 +58,19 @@ class _AllNotesState extends State<AllNotes> {
       });
     } catch (e) {
       print(e);
-      return [];
     }
     return onlineData;
   }
 
   Future<void> syncToFirebase() async {
-    List offlineNotes = await getNotes();
-    offlineNotes.forEach((element) {
-      checkKeyandPush(element);
-    });
+    if (FirebaseAuth.instance.currentUser != null) {
+      List offlineNotes = await getNotes();
+      if (offlineNotes != null) {
+        offlineNotes.forEach((element) {
+          checkKeyandPush(element);
+        });
+      }
+    }
   }
 
   void checkKeyandPush(Map<String, dynamic> note) async {
@@ -139,7 +142,6 @@ class _AllNotesState extends State<AllNotes> {
                             await syncToFirebase();
                             FirebaseAuth auth = FirebaseAuth.instance;
                             auth.signOut();
-                            Navigator.pop(context);
                             Navigator.pushReplacementNamed(context, '/');
                           },
                           child: Text(
