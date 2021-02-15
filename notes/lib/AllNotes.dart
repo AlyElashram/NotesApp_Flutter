@@ -167,6 +167,48 @@ class _AllNotesState extends State<AllNotes> {
         ),
         actions: [
           FlatButton(
+            child: Icon(
+              Icons.download_rounded,
+              color: Colors.blue,
+              size: 28,
+            ),
+            onPressed: () async {
+              showDialog(context: context, child: Loading());
+              await syncToFirebase().timeout(Duration(seconds: 4),
+                  onTimeout: () {
+                Navigator.pop(context);
+                showDialog(
+                    context: context,
+                    child: AlertDialog(
+                      title: Text(
+                        "Getting Notes Failed",
+                        style: TextStyle(
+                            fontFamily: 'SF_Pro_Display', fontSize: 30),
+                      ),
+                      content: Text(
+                        "Your Request has timed out please check your internet connections",
+                        style: TextStyle(fontFamily: 'SF', fontSize: 28),
+                      ),
+                      actions: [
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "Ok",
+                              style: TextStyle(fontFamily: 'SF', fontSize: 26),
+                            ))
+                      ],
+                    ));
+              });
+              Navigator.pop(context);
+              print(FirebaseAuth.instance.currentUser);
+              setState(() {});
+            },
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+          ),
+          FlatButton(
             onPressed: () async {
               if (Global.useOffline) {
                 showDialog(
@@ -198,7 +240,7 @@ class _AllNotesState extends State<AllNotes> {
                             child: Text(
                               "Cancel",
                               style: TextStyle(fontFamily: 'SF', fontSize: 26),
-                            ))
+                            )),
                       ],
                     ));
               } else {
